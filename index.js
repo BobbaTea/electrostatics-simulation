@@ -86,10 +86,6 @@ function init() {
   animate();
 }
 
-function numberInBetween(a, x1, x2) {
-  return a > x1 && a < x2;
-}
-
 function potentialCalc(a) {
   sum = 0;
   for (var i = 0; i < numCharges; i++) {
@@ -304,11 +300,8 @@ function fieldLines() {
   for (var a = 20; a < canvas.width; a += canvas.height / 10) {
     for (var b = 20; b < canvas.width; b += canvas.height / 10) {
       charge = 0.01;
-      pos = true;
       x = a;
       y = b;
-      newx = 0;
-      newy = 0;
       //commenting this makes it stop working
       //why?
       c.beginPath();
@@ -316,7 +309,7 @@ function fieldLines() {
       // c.fill();
       c.moveTo(x, y);
       c.strokeStyle = "rgb(0,0,0)";
-      for (var z = 0; z < 25; z++) {
+      for (var z = 0; z < 15; z++) {
         fx = 0;
         fy = 0;
         for (var i = 0; i < numCharges; i++) {
@@ -343,74 +336,67 @@ function fieldLines() {
             cl =
               (k * Math.abs(charge) * Math.abs(charges[i].charge)) /
               Math.pow(dist, 2);
-            sign = (
+            sign = -(
               (charge * charges[i].charge) /
               Math.abs(charge * charges[i].charge)
             );
-            
             // Components of force for x and y direction
-            fx += -cl * Math.cos(trig);
-            fy += -cl * -Math.sin(trig);
-
+            fx += sign * cl * Math.cos(trig);
+            fy += sign * cl * -Math.sin(trig);
           }
         }
-        var direction = Math.atan2(fy, fx);
-
-        if (direction >= 0) {
-          pos = true;
-        } else {
-          pos = false;
-        }
-
         l = 0.2 / Math.max(fx / charge, fy / charge);
         x += (fx / charge) * 0.1;
         y += (fy / charge) * 0.1;
+        newx = 0;
+        newy = 0;
         cont = true;
+        
         for (var u = 0; u < numCharges; u++) {
-            dist = distance(x, y, charges[u].x, charges[u].y);
-            radius = charges[u].radius;
-            if (dist <= radius) {
-              break;
-            }
+          dist = distance(x, y, charges[u].x, charges[u].y);
+          if (dist <= charges[u].radius) {
+            cont = false;
+          }
         }
-        
-        c.lineTo(x, y);
-        c.stroke();
-        newx = x;
-        newy = y;  
-        
+        if (cont) {
+          c.lineTo(x, y);
+          c.stroke();
+          newx = x;
+          newy = y;
+        } 
+        else {
+          break;
+        }
       }
       // calculates points to start and end arrowhead at, then draws it
           arrowlength = 10;
           // vector of line
-          console.log(newx, newy)
-          // draws at start of arrowhead or end of arrowhead depending on sign of f ()
-          if (true) { // plots at bottom of line
-            gx = newx - a;
-            gy = newy - b;
-            nx = gx / Math.sqrt((gx*gx)+(gy*gy));
-            ny = gy / Math.sqrt((gx*gx)+(gy*gy));
-            arrowangle = 30 * (Math.PI / 180);
-            arrow1x = arrowlength * ((nx*Math.cos(arrowangle)) - (ny*Math.sin(arrowangle)));
-            arrow1y = arrowlength * ((nx*Math.sin(arrowangle)) + (ny*Math.cos(arrowangle)));
-            arrow2x = arrowlength * ((nx*Math.cos(-arrowangle)) - (ny*Math.sin(-arrowangle)));
-            arrow2y = arrowlength * ((nx*Math.sin(-arrowangle)) + (ny*Math.cos(-arrowangle)));
-            arrow_x1 = newx - arrow1x;
-            arrow_y1 = newy - arrow1y;
-            arrow_x2 = newx - arrow2x;
-            arrow_y2 = newy - arrow2y;
-            c.moveTo(arrow_x1, arrow_y1);
-            c.lineTo(newx, newy);
-            c.moveTo(arrow_x2, arrow_y2);
-            c.lineTo(newx, newy);
-            c.stroke();  
-          } 
-          
+          gx = newx - a;
+          gy = newy - b;
+          nx = gx / Math.sqrt((gx*gx)+(gy*gy));
+          ny = gy / Math.sqrt((gx*gx)+(gy*gy));
+          arrowangle = 30 * (Math.PI / 180);
+          arrow1x = arrowlength * ((nx*Math.cos(arrowangle)) - (ny*Math.sin(arrowangle)));
+          arrow1y = arrowlength * ((nx*Math.sin(arrowangle)) + (ny*Math.cos(arrowangle)));
+          arrow2x = arrowlength * ((nx*Math.cos(-arrowangle)) - (ny*Math.sin(-arrowangle)));
+          arrow2y = arrowlength * ((nx*Math.sin(-arrowangle)) + (ny*Math.cos(-arrowangle)));
+
+          arrow_x1 = newx - arrow1x;
+          arrow_y1 = newy - arrow1y;
+          arrow_x2 = newx - arrow2x;
+          arrow_y2 = newy - arrow2y;
+
+          c.moveTo(arrow_x1, arrow_y1);
+          c.lineTo(newx, newy);
+          c.stroke();
+          c.moveTo(arrow_x2, arrow_y2);
+          c.lineTo(newx, newy);
+          c.stroke();
       
-          c.strokeStyle = "rgba(0,0,0,0)";
-          if (x < 0 || y < 0 || x > canvas.width || y > canvas.height) {
-            continue;
-        }
+      c.strokeStyle = "rgba(0,0,0,0)";
+      if (x < 0 || y < 0 || x > canvas.width || y > canvas.height) {
+        continue;
+      }
     }
   }
 }
