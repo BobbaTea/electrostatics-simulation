@@ -19,6 +19,47 @@ document.addEventListener("keyup", function () {
   selection = false;
 });
 
+// Add these new button event listeners
+document.getElementById("pinButton").addEventListener("click", () => {
+  disectionPin = !disectionPin;
+});
+
+document.getElementById("fieldButton").addEventListener("click", () => {
+  field = !field;
+});
+
+document.getElementById("deleteButton").addEventListener("mousedown", () => {
+  del = true;
+});
+
+document.getElementById("deleteButton").addEventListener("mouseup", () => {
+  del = false;
+});
+
+document.getElementById("infoButton").addEventListener("click", () => {
+  info = !info;
+});
+
+document.getElementById("pauseButton").addEventListener("click", () => {
+  pause = !pause;
+});
+
+document.getElementById("selectButton").addEventListener("mousedown", () => {
+  selection = true;
+});
+
+document.getElementById("selectButton").addEventListener("mouseup", () => {
+  selection = false;
+});
+
+document.getElementById("positiveButton").addEventListener("click", () => {
+  char = " =";
+});
+
+document.getElementById("negativeButton").addEventListener("click", () => {
+  char = " -";
+});
+
 var mx = undefined;
 var my = undefined;
 var char = " =";
@@ -53,8 +94,11 @@ function mouse(e) {
   my = e.clientY;
 }
 
-function addCharge() {
-  // if (!mDown) {
+function addCharge(event) {
+  // Check if the click was on a button
+  if (event.target.tagName === 'BUTTON') {
+    return;
+  }
 
   if (!del) {
     var amass = 0.0001;
@@ -68,8 +112,6 @@ function addCharge() {
       numCharges++;
     }
   }
-
-  // }
 }
 
 // Some math functions for simplicity and legibility
