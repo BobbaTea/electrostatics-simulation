@@ -4,6 +4,35 @@
       href="https://fonts.googleapis.com/css?family=Roboto+Mono"
       rel="stylesheet"
     />
+    <style>
+      .controls {
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+      }
+      
+      .controls button {
+        padding: 8px 16px;
+        border: none;
+        border-radius: 4px;
+        background-color: rgba(255, 255, 255, 0.8);
+        cursor: pointer;
+        font-family: 'Roboto Mono', monospace;
+        transition: background-color 0.2s;
+      }
+      
+      .controls button:hover {
+        background-color: rgba(255, 255, 255, 0.9);
+      }
+      
+      .controls button:active {
+        background-color: rgba(200, 200, 200, 0.9);
+      }
+    </style>
+    <title>Physics 7B Project</title>
   </head>
 
   <body
@@ -16,6 +45,17 @@
     "
   >
     <b>Physics 7B Project</b>
+
+    <div class="controls">
+      <button id="pinButton">Pin (P)</button>
+      <button id="fieldButton">Field Lines (F)</button>
+      <button id="deleteButton">Delete (D)</button>
+      <button id="infoButton">Info (I)</button>
+      <button id="pauseButton">Pause (Space)</button>
+      <button id="selectButton">Select (S)</button>
+      <button id="positiveButton">Positive (+)</button>
+      <button id="negativeButton">Negative (-)</button>
+    </div>
 
     <canvas id="canvas"></canvas>
 

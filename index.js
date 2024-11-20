@@ -5,7 +5,7 @@ canvas.width = innerWidth;
 canvas.height = innerHeight;
 
 // Array for charges and other constants
-numCharges = 0;
+var numCharges = 0;
 const k = 9 * Math.pow(10, 9);
 const sizeConstant = 1500;
 var charges = [];
@@ -17,6 +17,47 @@ document.addEventListener("keypress", keyRec);
 document.addEventListener("keyup", function () {
   del = false;
   selection = false;
+});
+
+// Add these new button event listeners
+document.getElementById("pinButton").addEventListener("click", () => {
+  disectionPin = !disectionPin;
+});
+
+document.getElementById("fieldButton").addEventListener("click", () => {
+  field = !field;
+});
+
+document.getElementById("deleteButton").addEventListener("mousedown", () => {
+  del = true;
+});
+
+document.getElementById("deleteButton").addEventListener("mouseup", () => {
+  del = false;
+});
+
+document.getElementById("infoButton").addEventListener("click", () => {
+  info = !info;
+});
+
+document.getElementById("pauseButton").addEventListener("click", () => {
+  pause = !pause;
+});
+
+document.getElementById("selectButton").addEventListener("mousedown", () => {
+  selection = true;
+});
+
+document.getElementById("selectButton").addEventListener("mouseup", () => {
+  selection = false;
+});
+
+document.getElementById("positiveButton").addEventListener("click", () => {
+  char = " =";
+});
+
+document.getElementById("negativeButton").addEventListener("click", () => {
+  char = " -";
 });
 
 var mx = undefined;
@@ -53,8 +94,11 @@ function mouse(e) {
   my = e.clientY;
 }
 
-function addCharge() {
-  // if (!mDown) {
+function addCharge(event) {
+  // If the click was on a button, don't add a charge
+  if (event.target.tagName === "BUTTON") {
+    return;
+  }
 
   if (!del) {
     var amass = 0.0001;
@@ -68,8 +112,6 @@ function addCharge() {
       numCharges++;
     }
   }
-
-  // }
 }
 
 // Some math functions for simplicity and legibility
@@ -118,6 +160,9 @@ function animate() {
   }
   if (info) {
     c.fillText(rnd(voltageCalc(mx, my)) + "V", mx, my);
+    // Display "+" or "-" at the top right of the cursor
+    const chargeType = char === " =" ? "+" : char === " -" ? "-" : "";
+    c.fillText(chargeType, mx - 2, my - 20);
   }
   for (var i = 0; i < numCharges; i++) {
     charges[i].update();
