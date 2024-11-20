@@ -95,8 +95,8 @@ function mouse(e) {
 }
 
 function addCharge(event) {
-  // Check if the click was on a button
-  if (event.target.tagName === 'BUTTON') {
+  // If the click was on a button, don't add a charge
+  if (event.target.tagName === "BUTTON") {
     return;
   }
 
