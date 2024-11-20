@@ -5,7 +5,7 @@ canvas.width = innerWidth;
 canvas.height = innerHeight;
 
 // Array for charges and other constants
-numCharges = 0;
+var numCharges = 0;
 const k = 9 * Math.pow(10, 9);
 const sizeConstant = 1500;
 var charges = [];
@@ -160,6 +160,9 @@ function animate() {
   }
   if (info) {
     c.fillText(rnd(voltageCalc(mx, my)) + "V", mx, my);
+    // Display "+" or "-" at the top right of the cursor
+    const chargeType = char === " =" ? "+" : char === " -" ? "-" : "";
+    c.fillText(chargeType, mx - 2, my - 20);
   }
   for (var i = 0; i < numCharges; i++) {
     charges[i].update();
