@@ -123,6 +123,10 @@ function rand(min, max) {
   return Math.random() * (max - min) + min;
 }
 
+function satisfiesEqOfCircle(centerx, centery, radius, x, y) { // returns if x and y satisfy equation of circle
+  return (((x - centerx)**2) + ((y - centery)**2) === (radius*radius))
+}
+
 // Init and frame animate methods
 function init() {
   animate();
@@ -354,7 +358,7 @@ function fieldLines() {
       // c.fill();
       c.moveTo(x, y);
       c.strokeStyle = "rgb(0,0,0)";
-      for (var z = 0; z < 25; z++) {
+      for (var z = 0; z < 10; z++) {
         fx = 0;
         fy = 0;
         for (var i = 0; i < numCharges; i++) {
@@ -364,14 +368,14 @@ function fieldLines() {
           dist = distance(x, y, charges[i].x, charges[i].y);
           // Calculate angles
           if (dist != 0) {
-            if (dx > 0) {
-              if (dy > 0) {
+            if (dx >= 0) {
+              if (dy >= 0) {
                 trig = Math.PI - Math.acos(Math.abs(dx) / dist);
               } else {
                 trig = Math.PI + Math.acos(Math.abs(dx) / dist);
               }
             } else {
-              if (dy > 0) {
+              if (dy >= 0) {
                 trig = Math.acos(Math.abs(dx) / dist);
               } else {
                 trig = 2 * Math.PI - Math.acos(Math.abs(dx) / dist);
@@ -391,22 +395,56 @@ function fieldLines() {
           }
         }
         l = 0.2 / Math.max(fx / charge, fy / charge);
+
+
+        newx = 0;
+        newy = 0;
+        cont = true;
+        intersectscharge = false;
         x += (fx / charge) * 0.1;
         y += (fy / charge) * 0.1;
-        cont = true;
+        
         for (var u = 0; u < numCharges; u++) {
-          dist = distance(x, y, charges[u].x, charges[u].y);
-          if (dist <= charges[u].radius) {
-            cont = false;
+          if (satisfiesEqOfCircle(charges[u].x, charges[u].y, charges[u].radius, x, y)) {
+            intersectscharge = true;
+            break;
           }
         }
-        if (cont) {
+
+        if (!intersectscharge) {
+          // c.strokeStyle = "red";
           c.lineTo(x, y);
           c.stroke();
-        } else {
-          break;
+          newx = x;
+          newy = y;
         }
+
+        
       }
+      // calculates points to start and end arrowhead at, then draws it
+      arrowlength = 10;
+      // vector of line
+      gx = newx - a;
+      gy = newy - b;
+      nx = gx / Math.sqrt((gx*gx)+(gy*gy));
+      ny = gy / Math.sqrt((gx*gx)+(gy*gy));
+      arrowangle = 30 * (Math.PI / 180);
+      arrow1x = arrowlength * ((nx*Math.cos(arrowangle)) - (ny*Math.sin(arrowangle)));
+      arrow1y = arrowlength * ((nx*Math.sin(arrowangle)) + (ny*Math.cos(arrowangle)));
+      arrow2x = arrowlength * ((nx*Math.cos(-arrowangle)) - (ny*Math.sin(-arrowangle)));
+      arrow2y = arrowlength * ((nx*Math.sin(-arrowangle)) + (ny*Math.cos(-arrowangle)));
+
+      arrow_x1 = newx - arrow1x;
+      arrow_y1 = newy - arrow1y;
+      arrow_x2 = newx - arrow2x;
+      arrow_y2 = newy - arrow2y;
+
+      c.moveTo(arrow_x1, arrow_y1);
+      c.lineTo(newx, newy);
+      c.moveTo(arrow_x2, arrow_y2);
+      c.lineTo(newx, newy);
+      c.stroke();
+      
       c.strokeStyle = "rgba(0,0,0,0)";
       if (x < 0 || y < 0 || x > canvas.width || y > canvas.height) {
         continue;
