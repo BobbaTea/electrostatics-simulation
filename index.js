@@ -81,8 +81,16 @@ function rand(min, max) {
   return Math.random() * (max - min) + min;
 }
 
-function satisfiesEqOfCircle(centerx, centery, radius, x, y) { // returns if x and y satisfy equation of circle
-  return (((x - centerx)**2) + ((y - centery)**2) === (radius*radius))
+function intersectsCharge(centerx, centery, radius, x, y, a, b) { // returns if line intersects circle
+  A = ((Math.pow(x - a, 2)) + (Math.pow(y - b), 2));
+  B = 2 * (((x - a)*(a - centerx)) + ((y - b) * (b - centery)));
+  C = ((Math.pow(a - centerx, 2)) + (Math.pow(b - centery, 2))) - Math.pow(radius, 2);
+
+  d = (Math.pow(B, 2) - (4*A*C));
+
+  // two = ((Math.pow(x - centerx, 2) + Math.pow(y - centery, 2)) <= Math.pow(radius, 2));
+
+  return ((d >= 0));
 }
 
 // Init and frame animate methods
@@ -312,8 +320,8 @@ function fieldLines() {
       // c.arc(x, y, 5, 0, Math.PI * 2, true);
       // c.fill();
       c.moveTo(x, y);
-      c.strokeStyle = "rgb(0,0,0)";
-      for (var z = 0; z < 10; z++) {
+
+      for (var z = 0; z < 20; z++) {
         fx = 0;
         fy = 0;
         for (var i = 0; i < numCharges; i++) {
@@ -351,56 +359,75 @@ function fieldLines() {
         }
         l = 0.2 / Math.max(fx / charge, fy / charge);
 
-
-        newx = 0;
-        newy = 0;
         cont = true;
         intersectscharge = false;
-        x += (fx / charge) * 0.1;
-        y += (fy / charge) * 0.1;
+        drawarrowhead = true;
+
+        totalE = Math.sqrt(Math.pow(fx/charge, 2) + Math.pow(fy/charge, 2));
+        x += (fx / charge) * 0.1; // F / q = E, E_x
+        y += (fy / charge) * 0.1; // E_y
         
+        max = 10;
+
         for (var u = 0; u < numCharges; u++) {
-          if (satisfiesEqOfCircle(charges[u].x, charges[u].y, charges[u].radius, x, y)) {
+          if (intersectsCharge(charges[u].x, charges[u].y, charges[u].radius, x, y, a, b)) {
             intersectscharge = true;
-            break;
+            // drawarrowhead = false;
           }
         }
-
-        if (!intersectscharge) {
-          // c.strokeStyle = "red";
-          c.lineTo(x, y);
-          c.stroke();
-          newx = x;
-          newy = y;
+        
+        if (totalE > 5) {
+          c.strokeStyle = "rgb(255, 0, 0)";
+        } else if (totalE > 2) {
+          c.strokeStyle = "rgb(0, 255, 0)";
+        } else {
+          c.strokeStyle = "rgb(0, 0, 255)";
         }
 
+
+        if (!intersectscharge) {
+          
+          c.lineTo(x, y);
+          // c.fillText(`${Math.round(totalE)}`, x, y);
+          c.stroke();
+          newx = x;
+          newy = y;    
+
+        }
+      
         
       }
-      // calculates points to start and end arrowhead at, then draws it
-      arrowlength = 10;
-      // vector of line
-      gx = newx - a;
-      gy = newy - b;
-      nx = gx / Math.sqrt((gx*gx)+(gy*gy));
-      ny = gy / Math.sqrt((gx*gx)+(gy*gy));
-      arrowangle = 30 * (Math.PI / 180);
-      arrow1x = arrowlength * ((nx*Math.cos(arrowangle)) - (ny*Math.sin(arrowangle)));
-      arrow1y = arrowlength * ((nx*Math.sin(arrowangle)) + (ny*Math.cos(arrowangle)));
-      arrow2x = arrowlength * ((nx*Math.cos(-arrowangle)) - (ny*Math.sin(-arrowangle)));
-      arrow2y = arrowlength * ((nx*Math.sin(-arrowangle)) + (ny*Math.cos(-arrowangle)));
 
-      arrow_x1 = newx - arrow1x;
-      arrow_y1 = newy - arrow1y;
-      arrow_x2 = newx - arrow2x;
-      arrow_y2 = newy - arrow2y;
+      if (drawarrowhead) {
 
-      c.moveTo(arrow_x1, arrow_y1);
-      c.lineTo(newx, newy);
-      c.moveTo(arrow_x2, arrow_y2);
-      c.lineTo(newx, newy);
-      c.stroke();
+        // calculates points to start and end arrowhead at, then draws it
+        
+        // vector of line
+        gx = newx - a;
+        gy = newy - b;
+        nx = gx / Math.sqrt((gx*gx)+(gy*gy));
+        ny = gy / Math.sqrt((gx*gx)+(gy*gy));
+        arrowlength = 10;
+        arrowangle =  40 * (Math.PI / 180);
+        arrow1x = arrowlength * ((nx*Math.cos(arrowangle)) - (ny*Math.sin(arrowangle)));
+        arrow1y = arrowlength * ((nx*Math.sin(arrowangle)) + (ny*Math.cos(arrowangle)));
+        arrow2x = arrowlength * ((nx*Math.cos(-arrowangle)) - (ny*Math.sin(-arrowangle)));
+        arrow2y = arrowlength * ((nx*Math.sin(-arrowangle)) + (ny*Math.cos(-arrowangle)));
+
+        arrow_x1 = newx - arrow1x;
+        arrow_y1 = newy - arrow1y;
+        arrow_x2 = newx - arrow2x;
+        arrow_y2 = newy - arrow2y;
+
+        c.moveTo(arrow_x1, arrow_y1);
+        c.lineTo(newx, newy);
+        c.moveTo(arrow_x2, arrow_y2);
+        c.lineTo(newx, newy);
+        c.stroke();
+
+      }
+
       
-      c.strokeStyle = "rgba(0,0,0,0)";
       if (x < 0 || y < 0 || x > canvas.width || y > canvas.height) {
         continue;
       }
